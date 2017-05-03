@@ -4,8 +4,21 @@
  https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
  */
 
-THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
+convertHex = function(hex){
+    hex = hex.toString(16);
+    hex.substring(0, (6 - hex.length)).split('').map(() => hex = '0' + hex);
 
+    var r = (parseInt(hex.substring(0,2), 16) / 255).toFixed(2);
+    var g = (parseInt(hex.substring(2,4), 16) / 255).toFixed(2);
+    var b = (parseInt(hex.substring(4,6), 16) / 255).toFixed(2);
+
+    return { r, g, b }
+ }
+
+THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold, color ) {
+	
+	color = (color === undefined) ? {r: 1, g: 1, b: 1} : convertHex(color);
+	
 	THREE.Pass.call( this );
 
 	this.strength = ( strength !== undefined ) ? strength : 1;
@@ -94,8 +107,8 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 	var bloomFactors = [1.0, 0.8, 0.6, 0.4, 0.2];
 	this.compositeMaterial.uniforms["bloomFactors"].value = bloomFactors;
-	this.bloomTintColors = [new THREE.Vector3(1,1,1), new THREE.Vector3(1,1,1), new THREE.Vector3(1,1,1)
-												,new THREE.Vector3(1,1,1), new THREE.Vector3(1,1,1)];
+	this.bloomTintColors = [new THREE.Vector3(color.r, color.g, color.b), new THREE.Vector3(color.r, color.g, color.b), new THREE.Vector3(color.r, color.g, color.b)
+			       ,new THREE.Vector3(color.r, color.g, color.b), new THREE.Vector3(color.r, color.g, color.b)];
 	this.compositeMaterial.uniforms["bloomTintColors"].value = this.bloomTintColors;
 
 	// copy material
